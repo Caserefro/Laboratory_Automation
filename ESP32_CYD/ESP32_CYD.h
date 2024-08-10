@@ -38,6 +38,60 @@ struct Layout {
   Button button[MAX_BUTTONS_PER_GROUP];
 };
 
+struct ScrollingTextSprite {
+  int complete = false;
+  int startIndex = 0;
+  int endIndex = 0;
+  int maxpxposition = 0;
+  int pxbeforenext = 0;
+  int pxcount = 0;
+  bool initCall = false;
+  bool SecondCall = false;
+  bool printed = 0;
+  String Buffer = "";
+};
+int ScrollingTextDelay = 0;
+long ScrolingTextAUXCOUNTER = 0;
+String ScrollingTextBuffer;
+
+TFT_eSprite ItemTopSprite = TFT_eSprite(&tft);
+TFT_eSprite NameandNCTopSprite = TFT_eSprite(&tft);
+TFT_eSprite DatesTopSprite = TFT_eSprite(&tft);
+ScrollingTextSprite ItemTop;
+ScrollingTextSprite NameandNCTop;
+ScrollingTextSprite DatesTop;
+
+TFT_eSprite ItemBottomSprite = TFT_eSprite(&tft);
+TFT_eSprite NameandNCBottomSprite = TFT_eSprite(&tft);
+TFT_eSprite DatesBottomSprite = TFT_eSprite(&tft);
+ScrollingTextSprite ItemBottom;
+ScrollingTextSprite NameandNCBottom;
+ScrollingTextSprite DatesBottom;
+
+#define TURNOFFSCREENPIN 27
+#define SLEEPTIMER 2
+int ScreenSaverX = 0;
+
+//Screens
+#define HomeScreenID 1
+#define InfoPopupID 2
+#define BorrowedScreenID 3
+#define AcScreenID 4
+#define WeatherScreenID 5
+#define ScreenSaverID 6
+
+//Animations in Screens
+unsigned char AnimationState = 0;       // 0 = No animation required.
+#define ScreenSaverEnabler 1            //Belongs to ScreenSaverID
+#define ScrollingTextBorrowedEnabler 2  //Belongs to BorrowedScreenID
+
+int Total_Layouts = 5;  // Update this count based on the number of initialized groups
+unsigned char ScreenState = HomeScreenID;
+unsigned char LastScreenState = HomeScreenID;
+int SleepingTimer = 2;
+int CurrentPair = 1;
+
+//task and kernel objects ----------------------------------------------------------------------------------------------------
 static TaskHandle_t TouchSensor_Task = NULL;
 static TaskHandle_t GraphicManager_Task = NULL;
 static TaskHandle_t Syncing_Task = NULL;
@@ -45,52 +99,31 @@ static TaskHandle_t Timer_Task = NULL;
 
 static QueueHandle_t GT911_queue;
 enum { GT911_QUEUE_LEN = 10 };  // Number of slots in message queue
-static SemaphoreHandle_t xMutex;
 
-bool WiFiState = 0, SDState = 0, Station1State = 0, Station2State = 0;
+SemaphoreHandle_t xTouchScrSyncSemaphore;  //Used for coordinating the Screen updating and the touch.
+SemaphoreHandle_t xScrWriteSemaphore;      //Used for coordinating the Screen updating and the touch.
+
+bool WiFiState = 0, SDState = 0, Station1State = 0, Station2State = 0;  //Flags for HomeScreen
 
 struct tm timeinfo;
 volatile bool DayFlag = 0, MinuteFlag = 0;
-
 hw_timer_t* timer = NULL;
 uint8_t timer_id = 0;
 uint16_t prescaler = 80;             // Between 0 and 65 535
 int threshold = (1000000 / 2) * 60;  // 64 bits value (limited to int size of 32bits)
 
-struct BorrowedItem {
-  int ItemID = 0;
-  String Item = "";  // 18 usable + null (max amount that can be fit in a row)
-  String Name = "";  // 15 usable + null
-  int NCID = 0;      // 2 usable + null
-  String Time = "";  // hour+date 1240+null = 12:40
-  String Date = "";  // day+month+year+null
-  bool Returned = 0;
-  //internal
-  String TimeReturned = "";  // hour+date 1240+null = 12:40
-  String DateReturned = "";  // day+month+year+null
-};
+#include "UI elements\Home_Screen.h"
+#include "UI elements\Ac_Screen.h"
+#include "UI elements\Borrowed_Screen.h"
+#include "UI elements\Icons.h"
+#include "UI elements\new_rodin.h"
+#include "UI elements\Weather_Screen.h"
 
-#define TURNOFFSCREENPIN 27
-
-#define HomeScreenID 1
-#define InfoPopupID 2
-#define BorrowedScreenID 3
-#define AcScreenID 4
-#define WeatherScreenID 5
-
-int Total_Layouts = 5;  // Update this count based on the number of initialized groups
-unsigned char ScreenState = HomeScreenID;
-int SleepingTimer = 2;
-
-#include "C:\Users\caser\Documents\GitHub\Laboratory_Automation\ESP32_CYD\UI elements\Home_Screen.h"
-#include "C:\Users\caser\Documents\GitHub\Laboratory_Automation\ESP32_CYD\UI elements\Ac_Screen.h"
-#include "C:\Users\caser\Documents\GitHub\Laboratory_Automation\ESP32_CYD\UI elements\Borrowed_Screen.h"
-#include "C:\Users\caser\Documents\GitHub\Laboratory_Automation\ESP32_CYD\UI elements\Icons.h"
-#include "C:\Users\caser\Documents\GitHub\Laboratory_Automation\ESP32_CYD\UI elements\new_rodin.h"
-#include "C:\Users\caser\Documents\GitHub\Laboratory_Automation\ESP32_CYD\UI elements\Weather_Screen.h"
-
-#include "C:\Users\caser\Documents\GitHub\Laboratory_Automation\ESP32_CYD\Credentials.h"
-#include "C:\Users\caser\Documents\GitHub\Laboratory_Automation\ESP32_CYD\tft_functions.h"
-#include "C:\Users\caser\Documents\GitHub\Laboratory_Automation\ESP32_CYD\Button_Layout.h"
-#include "C:\Users\caser\Documents\GitHub\Laboratory_Automation\ESP32_CYD\WiFi_functions.h"
+#include "Credentials.h"
+#include "Client_Definitions.h"
+#include "tft_functions.h"
+#include "Button_Layout.h"
+#include "http_functions.h"
+#include "http_Wrappers.h"
+#include "Step2Packages.h"
 #endif

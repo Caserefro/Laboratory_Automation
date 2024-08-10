@@ -1,11 +1,12 @@
 #include "C:\Users\caser\Documents\GitHub\Laboratory_Automation\ESP32_CYD\ESP32_CYD.h"
 
+
 void setup() {
   Serial.begin(115200);
   Serial.println("Start of program ---------------------------------------");
   vTaskDelay(100 / portTICK_PERIOD_MS);
   bbct.init(TOUCH_SDA, TOUCH_SCL, TOUCH_RST, TOUCH_INT);
-
+  DummydataSetup();
   vTaskDelay(100 / portTICK_PERIOD_MS);
   tft.init();
   tft.setRotation(1);
@@ -26,21 +27,15 @@ void setup() {
 
   // Create message queue before it is used
   GT911_queue = xQueueCreate(GT911_QUEUE_LEN, sizeof(TouchData));
-  xMutex = xSemaphoreCreateMutex();
 
-
-  // Start task to handle command line interface events. Let's set it at a
-  // higher priority but only run it once every 20 ms.
   xTaskCreate(TouchSensorTask,
               "Touch Sensor Task",
               2048,
               NULL,
               1,
               &TouchSensor_Task);
-
-  // Start task to calculate average. Save handle for use with notifications.
   xTaskCreate(GraphicManagerTask,  //manager of all the screens Changes in
-              "Publish data",
+              "Graphic Manager Task",
               16384,
               NULL,
               1,
@@ -54,13 +49,17 @@ void setup() {
               &Syncing_Task);*/
 
   xTaskCreate(TimerTask,
-              "Touch Sensor Task",
+              "Timer Task",
               1024,
               NULL,
               1,
               &Timer_Task);
   // Delete "setup and loop" task
   Serial.println("end of setup succesfull --------------------------");
+  xTouchScrSyncSemaphore = xSemaphoreCreateBinary();
+  xScrWriteSemaphore = xSemaphoreCreateBinary();
+  xSemaphoreGive(xTouchScrSyncSemaphore);  // Initially available
+  xSemaphoreGive(xScrWriteSemaphore);      // Initially available
   vTaskDelete(NULL);
 }
 void loop() {
@@ -77,59 +76,119 @@ void printFreeStackSpace(const char *taskName) {
 void TouchSensorTask(void *parameters) {
   while (1) {
     if (bbct.getSamples(&ti)) {
-      if (xSemaphoreTake(xMutex, 0) == pdTRUE) {
-        Serial.println("TouchSensorTask goes through mutex ****************************");
-        for (int i = 0; i < ti.count; i++) {  // Loop through all touch points
-          TouchData.x = x_coord;
-          TouchData.y = map(y_coord, 0, 320, 320, 0);
-          TouchData.size = ti.area[i];
-          // Send the touch data to the queue
+      for (int i = 0; i < ti.count; i++) {  // Loop through all touch points
+        TouchData.x = x_coord;
+        TouchData.y = map(y_coord, 0, 320, 320, 0);
+        TouchData.size = ti.area[i];
+
+        if (xSemaphoreTake(xTouchScrSyncSemaphore, 0) == pdTRUE) {  // Check if semaphore is available
+          SleepingTimer = SLEEPTIMER;
           xQueueSend(GT911_queue, (void *)&TouchData, 0);
+          xTaskNotify(GraphicManager_Task, 0, eIncrement);
+          vTaskDelay(pdMS_TO_TICKS(100));
+          xSemaphoreGive(xTouchScrSyncSemaphore);  // Release semaphore
         }
-        xSemaphoreGive(xMutex);
       }
     }
-    // Add a delay to prevent this task from consuming 100% CPU
-    //  Serial.println("end of TouchSensorTask succesfull --------------------------");
-    vTaskDelay(pdMS_TO_TICKS(35));  // Adjust the delay as needed (35)
   }
 }
 
+
 void GraphicManagerTask(void *parameters) {
-  // TO DO:add features to prevent burn in. https://www.topwaydisplay.com/index.php/en/blog/tft-lcd-burn-in
-  // TO DO:if ends up being annoying, make touch be ignored after scr changes
-  // TO DO:Make draws for ClubDesc_btn, a general use loading screen, and Scrolling text for borrowed, in case server is not available.
   TouchDatadef xTouchData;
-  while (1) {
-    //  if (xSemaphoreTake(xMutex, 0) == pdTRUE) {
-    if (xQueueReceive(GT911_queue, (void *)&xTouchData, 0) == pdTRUE) {  //used for touch and changing screens
-      Serial.println("beggining of GraphicManagerTask succesfull -------------------------- DATA:");
-      Serial.println(xTouchData.x);
-      Serial.println(xTouchData.y);
-      Serial.println(xTouchData.size);
-      digitalWrite(TURNOFFSCREENPIN, HIGH);
-      SleepingTimer = 1;
-      bool buttonPressed = false;  // Flag to indicate button press and exit
-      for (int i = 0; i < Total_Layouts && !buttonPressed; i++) {
-        if (Button_Layout[i].ID == ScreenState) {  // selects current screen
-          for (int j = 0; j < Button_Layout[i].numButtons; j++) {
-            if (isTouchWithinButton(xTouchData.x, xTouchData.y, xTouchData.size, Button_Layout[i].button[j])) {  // executes function for each button
-              Button_Layout[i].button[j].handler();                                                              // Call the button handler
-              xQueueReset(GT911_queue);                                                                          // Clear the queue after processing
-              buttonPressed = true;                                                                              // Set the flag to exit outer loop
-              break;                                                                                             // Exit inner loop
-            }
+  while (ulTaskNotifyTake(pdFALSE, portMAX_DELAY)) {
+    do {
+      switch (AnimationState) {
+        case ScreenSaverEnabler:
+          if (ScreenState != ScreenSaverID) {
+            digitalWrite(TURNOFFSCREENPIN, LOW);
+            ScreenSaverX = 0;
+            LastScreenState = ScreenState;
+            ScreenState = ScreenSaverID;
           }
+          if (xSemaphoreTake(xScrWriteSemaphore, portMAX_DELAY) == pdTRUE) {  // Check if semaphore is available
+            tft.fillScreen(TFT_BLACK);
+            tft.fillRect(ScreenSaverX, 0, 60, 320, TFT_WHITE);
+            xSemaphoreGive(xScrWriteSemaphore);  // Release semaphore
+          }
+          ScreenSaverX += 60;
+          if (ScreenSaverX == 480) ScreenSaverX = 0;
+          vTaskDelay(pdMS_TO_TICKS(200));
+          break;
+        case ScrollingTextBorrowedEnabler:
+          if (millis() - ScrolingTextAUXCOUNTER > ScrollingTextDelay || ScrollingTextDelay == 3001) {
+            if (ScrollingTextDelay == 3001) {
+              memset(&ItemTop, 0, sizeof(ItemTop));
+              memset(&NameandNCTop, 0, sizeof(NameandNCTop));
+              memset(&DatesTop, 0, sizeof(DatesTop));
+              memset(&ItemBottom, 0, sizeof(ItemBottom));
+              memset(&NameandNCBottom, 0, sizeof(NameandNCBottom));
+              memset(&DatesBottom, 0, sizeof(DatesBottom));
+            }
+            PrintScrollingText(ItemTopSprite, borrowedItems[((CurrentPair - 1) * 2)].Item, ItemTop, 37, 20, 297, 20);  //position / size
+            ScrollingTextBuffer = String(borrowedItems[((CurrentPair - 1) * 2)].Name + " " + borrowedItems[((CurrentPair - 1) * 2)].NCID);
+            PrintScrollingText(NameandNCTopSprite, ScrollingTextBuffer, NameandNCTop, 37, 45, 297, 20);
+            ScrollingTextBuffer = String("Borrowed: " + borrowedItems[((CurrentPair - 1) * 2)].Time + " " + borrowedItems[((CurrentPair - 1) * 2)].Date + " Returned: " + borrowedItems[((CurrentPair - 1) * 2)].TimeReturned + " " + borrowedItems[((CurrentPair - 1) * 2)].DateReturned);
+            PrintScrollingText(DatesTopSprite, ScrollingTextBuffer, DatesTop, 37, 70, 297, 20);
+            if (borrowedItems[((CurrentPair - 1) * 2) + 1].ItemID != 0) {  // here current pair is never out of limits, so this one is the only optional one.
+              PrintScrollingText(ItemBottomSprite, borrowedItems[((CurrentPair - 1) * 2) + 1].Item, ItemBottom, 37, 217, 297, 20);
+              ScrollingTextBuffer = String(borrowedItems[((CurrentPair - 1) * 2) + 1].Name + " " + borrowedItems[((CurrentPair - 1) * 2) + 1].NCID);
+              PrintScrollingText(NameandNCBottomSprite, ScrollingTextBuffer, NameandNCBottom, 37, 242, 297, 20);
+              ScrollingTextBuffer = String("Borrowed: " + borrowedItems[((CurrentPair - 1) * 2) + 1].Time + " " + borrowedItems[((CurrentPair - 1) * 2) + 1].Date + " Returned: " + borrowedItems[((CurrentPair - 1) * 2) + 1].TimeReturned + " " + borrowedItems[((CurrentPair - 1) * 2) + 1].DateReturned);
+              PrintScrollingText(DatesBottomSprite, ScrollingTextBuffer, DatesBottom, 37, 267, 297, 20);
+            }
+
+            ScrolingTextAUXCOUNTER = millis();
+            if (ScrollingTextDelay == 3000) {
+              ScrollingTextDelay = 30;
+            }
+            if (ScrollingTextDelay == 3001) {
+              ScrollingTextDelay = 3000;
+            }
+          } else {
+            vTaskDelay(pdMS_TO_TICKS(15));
+          }
+          break;
+      }
+      if (xQueueReceive(GT911_queue, (void *)&xTouchData, 0) == pdTRUE) {
+        if (xSemaphoreTake(xTouchScrSyncSemaphore, portMAX_DELAY) == pdTRUE) {  // Ensure screen is not updating
+          if (xSemaphoreTake(xScrWriteSemaphore, portMAX_DELAY) == pdTRUE) {    // Check if semaphore is available
+            Serial.println("DEBUG: A touch was registered!: -------------------------- DATA:");
+            Serial.println(xTouchData.x);
+            Serial.println(xTouchData.y);
+            Serial.println(xTouchData.size);
+
+            if (AnimationState == ScreenSaverEnabler) {  // This might get moved out
+              AnimationState = 0;
+              digitalWrite(TURNOFFSCREENPIN, HIGH);
+              RecoverScreenState();
+              vTaskDelay(pdMS_TO_TICKS(300));
+            } else {
+              bool buttonPressed = false;
+              for (int i = 0; i < Total_Layouts && !buttonPressed; i++) {
+                if (Button_Layout[i].ID == ScreenState) {
+                  for (int j = 0; j < Button_Layout[i].numButtons; j++) {
+                    if (isTouchWithinButton(xTouchData.x, xTouchData.y, xTouchData.size, Button_Layout[i].button[j])) {
+                      Button_Layout[i].button[j].handler();
+                      buttonPressed = true;
+                      xQueueReset(GT911_queue);
+                      break;
+                    }
+                  }
+                }
+              }
+            }
+            xSemaphoreGive(xScrWriteSemaphore);  // Release semaphore
+          }
+          xSemaphoreGive(xTouchScrSyncSemaphore);  // Release semaphore to allow touch processing
         }
       }
-    }
-    /*else {
-      ulTaskNotifyTake(pdTRUE, portMAX_DELAY);  //used for updating state of hardware.
-    }*/
-    //  xSemaphoreGive(xMutex);
-    // }
+    } while (AnimationState != 0);
   }
+  vTaskSuspend(NULL);
 }
+
+
 /*
 void SyncingTask(void *parameters) {
   while (1) {
@@ -149,16 +208,17 @@ void TimerTask(void *parameters) {
     Serial.println("TimerTask ran succesfull --------------------------");
     SleepingTimer--;
     if (SleepingTimer == 0) {
-      digitalWrite(TURNOFFSCREENPIN, LOW);
-      SleepingTimer = 1;
-    }
-    if (!(ScreenState == HomeScreenID)) {  //check for homepage
-      vTaskSuspend(NULL);
-    }
-    Write_HomeScr_time();  //update time in Scr
-    if (DayFlag) {         //update date
-      Write_HomeScr_date();
-      DayFlag = false;
+      AnimationState = ScreenSaverEnabler;
+      //   xTaskNotifyGive(ScreenSaver_Task);
+      xTaskNotify(GraphicManager_Task, 0, eIncrement);  // Notify Task C to start
+    } else {
+      if (ScreenState == HomeScreenID) {  //check for homepage
+        Write_HomeScr_time();             //update time in Scr
+        if (DayFlag) {                    //update date
+          Write_HomeScr_date();
+          DayFlag = false;
+        }
+      }
     }
     vTaskSuspend(NULL);
   }

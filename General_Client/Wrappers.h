@@ -306,9 +306,9 @@ void OP_RETURNED_Wrapper(int ItemID, int State) {
       deserializeJson(ReceivedJson, response);
       for (int i = 0; i < MAX_ITEMS; ++i) {
         if (borrowedItems[i].ItemID == ReceivedJson["ItemID"]) {
-          borrowedItems[i].Returned == ReceivedJson["Returned"];
-          borrowedItems[i].TimeReturned == ReceivedJson["TimeReturned"].as<String>();
-          borrowedItems[i].DateReturned == ReceivedJson["DateReturned"].as<String>();
+          borrowedItems[i].Returned = ReceivedJson["Returned"];
+          borrowedItems[i].TimeReturned = ReceivedJson["TimeReturned"].as<String>();
+          borrowedItems[i].DateReturned = ReceivedJson["DateReturned"].as<String>();
         }
       }
     } else {
