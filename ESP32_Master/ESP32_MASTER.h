@@ -133,7 +133,7 @@ int borrowedItemsIDs[MAX_ITEMS];
 static TaskHandle_t Step1_Task = NULL;
 static TaskHandle_t Step2_Task = NULL;
 
-
+/*
 //Example data
 BorrowedItem borrowedItemIE1 = { 1, "Laptop", "John Doe", 12, "1240", "15072024", true, "1300", "15072024" };
 BorrowedItem borrowedItemIE2 = { 2, "Projector", "Jane Smith", 34, "0930", "14072024", false, "", "" };
@@ -142,7 +142,7 @@ BorrowedItem borrowedItemIE3 = { 3, "Camera", "Alice Johnson", 56, "1430", "1307
 UserData UserIE1 = { 1, "johndoe", "John Doe", 89, "password1234" };
 UserData UserIE2 = { 2, "janesmith", "Jane Smith", 21, "mypassword" };
 UserData UserIE3 = { 3, "alicebrown", "Alice Brown", 65, "securepass" };
-
+*/
 // Prototypes
 void RandomNonceGenerator(unsigned char nonce[16]);
 bool encryptStringCBC(const String &plainText, const char *key, String &OutputString);

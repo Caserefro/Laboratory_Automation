@@ -112,6 +112,32 @@ uint8_t timer_id = 0;
 uint16_t prescaler = 80;             // Between 0 and 65 535
 int threshold = (1000000 / 2) * 60;  // 64 bits value (limited to int size of 32bits)
 
+void IRAM_ATTR timer_isr();
+void WriteText_tft(String text, int x, int y);
+void PrintScrollingText(TFT_eSprite& ScrollingText, String& text, ScrollingTextSprite& ScrollText, int x, int y, int xsize, int ysize);
+void Write_HomeScr_time();
+void Write_HomeScr_date();
+void Home_ScreenUpdate();
+void BorrowedScreen();
+void Ac_ScreenUpdate();
+void Weather_Screen();
+bool SD_Card_Available();
+bool isTouchWithinButton(int x, int y, int size, Button button);
+void LockUnlock_btn();
+void BorrowedScr_btn();
+void ClubDesc_btn();
+void BorrowedUp_btn();
+void BorrowedDown_btn();
+void LeftArrow_btn();
+void RightArrow_btn();
+void Save_btn();
+void OnOff_btn();
+void SwingFan_btn();
+void UpTemp_btn();
+void DownTemp_btn();
+void LoadingPopup();
+void RecoverScreenState();
+
 #include "UI elements\Home_Screen.h"
 #include "UI elements\Ac_Screen.h"
 #include "UI elements\Borrowed_Screen.h"

@@ -107,7 +107,7 @@ void OP_STATIONS_STATE_Handler(String& Package) {
   JsonDocument JsonPackagetoSend;
   JsonPackagetoSend["Station1"] = StationsState.Station1;
   JsonPackagetoSend["Station2"] = StationsState.Station2;
-  serializeJson(JsonPackagetoSend, Package);
+  serializeJson(JsonPackagetoSend, Package); 
 }
 
 void OP_INFOITEMS_Handler(String& Package) {
@@ -115,8 +115,8 @@ void OP_INFOITEMS_Handler(String& Package) {
   JsonDocument doc;
   String ReadedJson = "";
   int position = 0;
-  JsonArray array = JsonPackagetoSend.createNestedArray("ServerIDs");
-  while (readJsonLittleFS(LittleFS, UsersFile, ReadedJson, doc, position, MOVING_UP_FILE, WITH_JSON)) {
+  JsonArray array = JsonPackagetoSend.createNestedArray("ServerIDs"); //IDs in server memory.
+  while (readJsonLittleFS(LittleFS, BorrowedItemsFile, ReadedJson, doc, position, MOVING_UP_FILE, WITH_JSON)) {
     array.add(doc["ItemID"]);
   }
   serializeJson(JsonPackagetoSend, Package);
@@ -129,7 +129,7 @@ void OP_ITEM_REQUEST_Handler(JsonDocument& JsonPackageReceived, String& Package)
   JsonDocument JsonPackagetoSend;
   int counter = 0;
   for (int i = 0; counter < JsonPackageReceived["LackingIDs"].size(); i++) {
-    readJsonLittleFS(LittleFS, UsersFile, ReadedJson, doc, position, READING_FILE, WITH_JSON);
+    readJsonLittleFS(LittleFS, BorrowedItemsFile, ReadedJson, doc, position, READING_FILE, WITH_JSON);
     if (JsonPackageReceived["LackingIDs"][counter] == doc["ItemID"]) {
       Package += ReadedJson;
       i = 0;

@@ -1,7 +1,12 @@
 #ifndef CLIENT_DEFINITONS_H
 #define CLIENT_DEFINITONS_H
 
-
+#include <WiFi.h>
+#include <HTTPClient.h>
+#include <ArduinoJson.h>
+#include <Arduino.h>
+#include <mbedtls/aes.h>
+#include "mbedtls/base64.h"
 
 String serverNameS1 = "http://192.168.100.184/S1";
 String serverNameS2 = "http://192.168.100.184/S2";
@@ -48,10 +53,6 @@ struct BorrowedItem {
 #define MAX_ITEMS 50  // Maximum number of borrowed items
 BorrowedItem borrowedItems[MAX_ITEMS];
 
-// Continue initializing other elements if needed
-
-
-
 struct WeatherDatadef {
   double UVidx = 0;
   double WindSpd = 0;
@@ -66,5 +67,38 @@ struct StationsStatedef {
   bool Station2 = false;
 } StationsState;
 
+
+//Prototypes
+void RandomNonceGenerator(unsigned char nonce[16]);
+bool encryptStringCBC(const String &plainText, const char *key, String &OutputString);
+bool decryptStringCBC(const String &cipherText, const char *key, String &OutputString);
+bool postData(String &serverName, String &payload, String &response);
+void httpGETRequest(String &serverName, String &payload);
+void Step1Package(String &PackagetoSend, String &FirstNonce);
+bool Step2PackageCore(String &ReceivedPackage, JsonDocument &JsonPackagetoSend, String &FirstNonce);
+
+void Step2Package_OP_GENERAL_USE(JsonDocument &JsonPackagetoSend, String &PackagetoSend, int Operation);
+void Step2Package_OP_ITEM_REQUEST(JsonDocument &JsonPackagetoSend, String &PackagetoSend, int Operation, int *LackingIDs);
+void Step2Package_OP_RETURNED(JsonDocument &JsonPackagetoSend, String &PackagetoSend, int ItemID, int State);
+void Step2Package_OP_AC(JsonDocument &JsonPackagetoSend, String &PackagetoSend, int Operation, int Command);
+void addItem(const BorrowedItem &item);
+bool removeItem(int itemID);
+BorrowedItem *findItem(int itemID);
+
+
+void OP_SERVER_PING_Wrapper();
+void OP_OPEN_CLOSE_Wrapper();
+void OP_TIME_Wrapper();
+void OP_WEATHER_Wrapper();
+void OP_STATIONS_STATE_Wrapper();
+void OP_INFOITEMS_Wrapper(int *LackingIDs);
+void OP_ITEM_REQUEST_Wrapper(int *LackingIDs);
+void UpdateBorrowedItems();
+void OP_RETURNED_Wrapper(int ItemID, int State);
+void OP_AC_Wrapper(int Command);
+//void OP_ADDITEM_Handler();
+
+
+int itemCount = 0;  // Current number of items in the array Not used. 
 
 #endif

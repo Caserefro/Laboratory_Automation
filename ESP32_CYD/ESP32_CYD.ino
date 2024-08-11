@@ -6,7 +6,7 @@ void setup() {
   Serial.println("Start of program ---------------------------------------");
   vTaskDelay(100 / portTICK_PERIOD_MS);
   bbct.init(TOUCH_SDA, TOUCH_SCL, TOUCH_RST, TOUCH_INT);
-  DummydataSetup();
+  //  DummydataSetup();
   vTaskDelay(100 / portTICK_PERIOD_MS);
   tft.init();
   tft.setRotation(1);
@@ -17,7 +17,14 @@ void setup() {
   tft.setTextColor(TFT_BLACK, TFT_WHITE);
   // Load the font
   tft.loadFont(newrodin);
-  vTaskDelay(2000 / portTICK_PERIOD_MS);
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    Serial.println("Connecting to WiFi...");
+  }
+  Serial.println("Connected to WiFi");
+  vTaskDelay(1000 / portTICK_PERIOD_MS);
+  OP_TIME_Wrapper();
   Home_ScreenUpdate();
 
   timer = timerBegin(timer_id, prescaler, true);
@@ -30,7 +37,7 @@ void setup() {
 
   xTaskCreate(TouchSensorTask,
               "Touch Sensor Task",
-              2048,
+              4096,
               NULL,
               1,
               &TouchSensor_Task);
@@ -50,7 +57,7 @@ void setup() {
 
   xTaskCreate(TimerTask,
               "Timer Task",
-              1024,
+              4096,
               NULL,
               1,
               &Timer_Task);

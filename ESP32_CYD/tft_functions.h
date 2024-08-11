@@ -210,19 +210,19 @@ void PrintScrollingText(TFT_eSprite& ScrollingText, String& text, ScrollingTextS
 
 
 void Write_HomeScr_time() {
-  String Time_24_Hour = "";  //Global?
-  String Date = "";
-  String aux = Time_24_Hour + "   " + Date;
-  aux = "12:54";
-  WriteText_tft(aux, 134, 7);  //fixed positions inside the screen.
+  char timeBuffer[6];  // Buffer for the time format "MM:HH"
+  // Format the time as "min:hour"
+  strftime(timeBuffer, sizeof(timeBuffer), "%H:%M", &timeinfo);
+  String TimeReturned = String(timeBuffer);
+  WriteText_tft(TimeReturned, 134, 7);  //fixed positions inside the screen.
 }
 
 void Write_HomeScr_date() {
-  String Time_24_Hour = "";  //Global?
-  String Date = "";
-  String aux = Time_24_Hour + "   " + Date;
-  aux = "01/07/24";
-  WriteText_tft(aux, 226, 7);  //fixed positions inside the screen.
+  char dateBuffer[11];  // Buffer for the date format "DD/MM/YY"
+  // Format the date as "Day/Month/last two digits of year"
+  strftime(dateBuffer, sizeof(dateBuffer), "%d/%m/%y", &timeinfo);
+  String DateReturned = String(dateBuffer);
+  WriteText_tft(DateReturned, 226, 7);  //fixed positions inside the screen.
 }
 
 void Home_ScreenUpdate() {
@@ -285,17 +285,18 @@ void Ac_ScreenUpdate() {
   ScreenState = AcScreenID;
 }
 
+
 void Weather_Screen() {  // values come from global
+  LoadingPopup();
+  OP_WEATHER_Wrapper();
   tft.pushImage(0, 0, 480, 320, Weather_Ui);
-  String WindSpd = "60 km/h";
-  String WindDir = "NE";
-  String UVidx = "10.1";
-  String Temp = "35 C";
-  String RainGauge = "1.2mm";
-  String Hum = "60%";
+  String WindSpd = String((int)WeatherData.WindSpd) + " km/h";
+  String Temp = String((int)WeatherData.Temp) + " C";
+  String RainGauge = String((int)WeatherData.RainG) + " mm";
+  String Hum = String((int)WeatherData.RelHum) + "%";
   WriteText_tft(WindSpd, 115, 62);
-  WriteText_tft(WindDir, 302, 62);
-  WriteText_tft(UVidx, 115, 156);
+  WriteText_tft(WeatherData.WindDir, 302, 62);
+  WriteText_tft(String((int)WeatherData.UVidx), 115, 156);
   WriteText_tft(Temp, 299, 156);
   WriteText_tft(RainGauge, 115, 255);
   WriteText_tft(Hum, 299, 255);
@@ -318,10 +319,15 @@ bool isTouchWithinButton(int x, int y, int size, Button button) {
 // Home Screen button functions
 void LockUnlock_btn() {
   //Send Command to master, so he sends it to espLock
+  LoadingPopup();
+  OP_OPEN_CLOSE_Wrapper();
+  RecoverScreenState();
 }
 
 void BorrowedScr_btn() {
+  LoadingPopup();
   CurrentPair = 1;
+  UpdateBorrowedItems();
   BorrowedScreen();
 }
 
@@ -333,9 +339,11 @@ void ClubDesc_btn() {
 // Borrowed Screen button functions
 
 void BorrowedUp_btn() {
+  LoadingPopup();
 }
 
 void BorrowedDown_btn() {
+  LoadingPopup();
 }
 
 void LeftArrow_btn() {
@@ -352,21 +360,39 @@ void RightArrow_btn() {
   BorrowedScreen();
 }
 
-void Save_btn() {  //Pending
+void Save_btn() {  //Pending. Will dump all borrowed data into the sd card.
+  LoadingPopup();
 }
 
 // Ac Screen button functions
 
 void OnOff_btn() {
+  LoadingPopup();
+  OP_AC_Wrapper(OP_ACONOFF);
+  Ac_ScreenUpdate();
 }
 
 void SwingFan_btn() {
+  LoadingPopup();
+  OP_AC_Wrapper(OP_ACSWINGFAN);
+  Ac_ScreenUpdate();
 }
 
 void UpTemp_btn() {
+  LoadingPopup();
+  OP_AC_Wrapper(OP_ACUPTEMP);
+  Ac_ScreenUpdate();
 }
 
 void DownTemp_btn() {
+  LoadingPopup();
+  OP_AC_Wrapper(OP_ACDOWNTEMP);
+  Ac_ScreenUpdate();
+}
+
+void LoadingPopup() {
+  tft.fillCircle(240, 160, 85, TFT_BLACK);
+  tft.pushImage(192, 104, 96, 112, Hourglass);
 }
 
 void RecoverScreenState() {
