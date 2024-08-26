@@ -8,8 +8,8 @@
 #include <mbedtls/aes.h>
 #include "mbedtls/base64.h"
 
-String serverNameS1 = "http://192.168.100.184/S1";
-String serverNameS2 = "http://192.168.100.184/S2";
+String serverNameS1 = "http://192.168.0.184/S1";
+String serverNameS2 = "http://192.168.0.184/S2";
 
 const char ID[] = "0x06";  //Deprecated, could add an ID recognition part, but is a wip.
 

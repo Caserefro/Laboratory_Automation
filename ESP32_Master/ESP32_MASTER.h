@@ -19,7 +19,7 @@ long TimeSinceLastSync = 0;
 WebServer server(80);
 
 // Set your Static IP address
-IPAddress local_IP(192, 168, 100, 184);
+IPAddress local_IP(192, 168, 0, 184);
 //String serverName = "http://192.168.100.184/Borrowed";
 // Set your Gateway IP address
 IPAddress gateway(192, 168, 1, 1);
@@ -188,6 +188,7 @@ void OP_ANDROID_LAYOUT_INFO_Handler(String& Package);
 void OP_ANDROID_LAYOUT_Handler(String& Package);
 #include "Credentials.h"
 #include "LittleFsFunctions.h"
+#include "IR_Remote.h"
 #include "Wrappers.h"
 #include "http_handlers.h"
 #endif

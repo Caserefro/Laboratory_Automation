@@ -2,6 +2,8 @@
 
 void setup() {
   Serial.begin(115200);
+  pinMode(IRLEDpin, OUTPUT);
+  digitalWrite(IRLEDpin, LOW);  //turn off IR LED to start
   // Configures static IP address
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
@@ -25,7 +27,7 @@ void setup() {
   }
   deleteFile(LittleFS, BorrowedItemsFile);  //Testing
   deleteFile(LittleFS, RecordFile);         //Testing
-  deleteFile(LittleFS, UsersFile);         //Testing
+  deleteFile(LittleFS, UsersFile);          //Testing
   TestingSetup(LittleFS);                   //Testing
 
   TotalJsoninFile(LittleFS, BorrowedItemsFile);

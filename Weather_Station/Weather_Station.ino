@@ -13,14 +13,14 @@ void setup() {
 }
 
 void loop() {
-  if (minutes % 5 == 0) {
+  if (minutes % 5 == 0 && minutes != 0) {
     LTRRead();
-    AM2315Status(AM2315Read());
+    // AM2315Status(AM2315Read());
     Serial.print("Sending packet ");
     Serial.println();
     Serial.println("");
     // Send packet
     LoRa.beginPacket();
-    LoRa.print();
+    LoRa.print("putos aaaa");
   }
 }

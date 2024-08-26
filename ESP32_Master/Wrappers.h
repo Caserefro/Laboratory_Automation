@@ -107,7 +107,7 @@ void OP_STATIONS_STATE_Handler(String& Package) {
   JsonDocument JsonPackagetoSend;
   JsonPackagetoSend["Station1"] = StationsState.Station1;
   JsonPackagetoSend["Station2"] = StationsState.Station2;
-  serializeJson(JsonPackagetoSend, Package); 
+  serializeJson(JsonPackagetoSend, Package);
 }
 
 void OP_INFOITEMS_Handler(String& Package) {
@@ -115,7 +115,7 @@ void OP_INFOITEMS_Handler(String& Package) {
   JsonDocument doc;
   String ReadedJson = "";
   int position = 0;
-  JsonArray array = JsonPackagetoSend.createNestedArray("ServerIDs"); //IDs in server memory.
+  JsonArray array = JsonPackagetoSend.createNestedArray("ServerIDs");  //IDs in server memory.
   while (readJsonLittleFS(LittleFS, BorrowedItemsFile, ReadedJson, doc, position, MOVING_UP_FILE, WITH_JSON)) {
     array.add(doc["ItemID"]);
   }
@@ -141,7 +141,34 @@ void OP_ITEM_REQUEST_Handler(JsonDocument& JsonPackageReceived, String& Package)
 }
 
 void OP_AC_Handler(JsonDocument& JsonPackageReceived, String& Package, int& Command) {
+  static int currenttemp = 5;
+  static bool OnorOff = 0;
   Command = JsonPackageReceived["Command"];
+  switch (Command) {
+    case OP_ACONOFF:
+      OnorOff = !OnorOff;
+      IRsendCode(OnorOff ? TurnONCodeAC : TurnOFFCodeAC);
+      IRsendCode(OnorOff ? TurnONCodeAC : TurnOFFCodeAC);
+      break;
+    case OP_ACSWINGFAN:
+      IRsendCode(SwingCodeAC);
+      IRsendCode(SwingCodeAC);
+      break;
+    case OP_ACUPTEMP:
+      IRsendCode(tempcodes[currenttemp]);
+      IRsendCode(tempcodes[currenttemp]);
+      currenttemp++;
+      if (currenttemp > 11)
+        currenttemp = 11;
+      break;
+    case OP_ACDOWNTEMP:
+      IRsendCode(tempcodes[currenttemp]);
+      IRsendCode(tempcodes[currenttemp]);
+      currenttemp--;
+      if (currenttemp < 0)
+        currenttemp = 0;
+      break;
+  }
   Package = "OK";
 }
 // PENDING FOR CHECKS --------------------------------------------------------------------------------------------------------------
@@ -212,15 +239,15 @@ void OP_ADMIN_INFO_Handler(String& Package) {  //left for the end
 }
 
 void printTMStructure() {  // TESTING
-    Serial.println("tm_sec (Seconds): " + String(timeinfo.tm_sec));
-    Serial.println("tm_min (Minutes): " + String(timeinfo.tm_min));
-    Serial.println("tm_hour (Hours): " + String(timeinfo.tm_hour));
-    Serial.println("tm_mday (Day of Month): " + String(timeinfo.tm_mday));
-    Serial.println("tm_mon (Month of Year): " + String(timeinfo.tm_mon));
-    Serial.println("tm_year (Years since 1900): " + String(timeinfo.tm_year));
-    Serial.println("tm_wday (Day of Week): " + String(timeinfo.tm_wday));
-    Serial.println("tm_yday (Day of Year): " + String(timeinfo.tm_yday));
-    Serial.println("tm_isdst (Daylight Saving Time Flag): " + String(timeinfo.tm_isdst));
+  Serial.println("tm_sec (Seconds): " + String(timeinfo.tm_sec));
+  Serial.println("tm_min (Minutes): " + String(timeinfo.tm_min));
+  Serial.println("tm_hour (Hours): " + String(timeinfo.tm_hour));
+  Serial.println("tm_mday (Day of Month): " + String(timeinfo.tm_mday));
+  Serial.println("tm_mon (Month of Year): " + String(timeinfo.tm_mon));
+  Serial.println("tm_year (Years since 1900): " + String(timeinfo.tm_year));
+  Serial.println("tm_wday (Day of Week): " + String(timeinfo.tm_wday));
+  Serial.println("tm_yday (Day of Year): " + String(timeinfo.tm_yday));
+  Serial.println("tm_isdst (Daylight Saving Time Flag): " + String(timeinfo.tm_isdst));
 }
 
 
@@ -250,7 +277,7 @@ void OP_ADMIN_ALLSTUDENTS_Handler(String& Package) {
   while (readJsonLittleFS(LittleFS, UsersFile, ReadedJson, doc, position, READING_FILE, WITH_JSON)) {
     Buffer = doc["Username"].as<String>();
     Package += Buffer;
-    Package +=",";
+    Package += ",";
   }
 }
 

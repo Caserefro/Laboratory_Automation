@@ -15,7 +15,7 @@ Adafruit_LTR390 ltr = Adafruit_LTR390();
 // Define the pins used by the LoRa module
 const int LoRacsPin = 5;      // LoRa radio chip select
 const int LoRaResetPin = 14;  // LoRa radio reset
-const int LoRaintPin = 4;     // Must be a hardware interrupt pin
+const int LoRaintPin = 2;     // Must be a hardware interrupt pin
 
 hw_timer_t * timer = NULL;
 uint8_t timer_id = 0;
@@ -23,7 +23,7 @@ uint16_t prescaler = 80;  // Between 0 and 65 535
 int threshold = 1000000;  // 64 bits value (limited to int size of 32bits)
 // all since startup
 int seconds;
-int mins = 0;
+int minutes = 0;
 long int hours = 0;
 int days = 0; 
 int months = 0; 
@@ -133,7 +133,7 @@ void LoRainit(){
 
 // ISR ***********************************************************************
 void IRAM_ATTR timer_isr() {  
-  .//executes each second 
+  //executes each second 
     // Example increment operation
     seconds = (seconds + 1) % 60;
     if (seconds == 0) {

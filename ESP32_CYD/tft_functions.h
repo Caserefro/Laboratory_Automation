@@ -227,6 +227,7 @@ void Write_HomeScr_date() {
 
 void Home_ScreenUpdate() {
   tft.pushImage(0, 0, 480, 320, Home_Screen);
+  tft.fillRect(130, 5, 230, 25, TFT_WHITE);
   Write_HomeScr_time();
   Write_HomeScr_date();
   tft.pushImage(40, 1, 24, 28, SDState ? SD_ok : No_SD);
