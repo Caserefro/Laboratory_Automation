@@ -62,21 +62,7 @@ void OP_TIME_Wrapper() {
   String Package = "";
   String OldNonce = "";
   JsonDocument doc;
-  Step1Package(Package, OldNonce);
-  if (postData(serverNameS1, Package, response)) {
-    Step2PackageCore(response, doc, OldNonce);
-    Step2Package_OP_GENERAL_USE(doc, Package, OP_TIME);
-    if (postData(serverNameS2, Package, responsebuffer)) {
-      decryptStringCBC(responsebuffer, key, response);
-      Serial.println(response);
-      deserializeJson(doc, response);
-    } else {
-      response = "error posting data";
-      return;
-    }
-  } else {
-    response = "error posting data";
-  }
+  httpGETRequest();
 
   timeinfo.tm_sec = doc["tm_sec"];
   timeinfo.tm_min = doc["tm_min"];

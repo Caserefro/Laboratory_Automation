@@ -118,8 +118,9 @@ bool postData(String &serverName, String &payload, String &response) {
     // Check the returning code
     if (httpResponseCode > 0) {
       response = http.getString();  // Get the response to the request
-                                    // Serial.println(response);     // Print request answer
-      http.end();                   // Free resources
+
+      Serial.println(response);  // Print request answer
+      http.end();                // Free resources
       return 1;
     } else {
       Serial.print("Error on sending POST: ");
@@ -151,7 +152,7 @@ void httpGETRequest(String &serverName, String &payload) {  //Not used.
       // file found at server
       if (httpCode == HTTP_CODE_OK) {
         payload = http.getString();
-        //  Serial.println(payload);
+        Serial.println(payload);
       }
     } else {
       Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
@@ -237,9 +238,10 @@ bool Step2PackageCore(String &ReceivedPackage, JsonDocument &JsonPackagetoSend, 
 
   decryptStringCBC(ReceivedPackage, key, ReceivedPackageDecrypted);
   deserializeJson(JsonPackageReceived, ReceivedPackageDecrypted);
-
+  Serial.println(ReceivedPackageDecrypted);
   String EncryptedFirstNonce = JsonPackageReceived["EncryptedFirstNonce"];
   decryptStringCBC(EncryptedFirstNonce, key, ReceivedDecryptedNonce);
+
 
   if (ReceivedDecryptedNonce == FirstNonce) {
     String EncryptedSecondNonce = "";

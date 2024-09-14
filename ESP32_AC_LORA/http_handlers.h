@@ -31,7 +31,6 @@ bool encryptStringCBC(const String &plainText, const char *key, String &OutputSt
   if (bytestopadd) {
     for (int i = ((slices)*16) - (bytestopadd); i < sizeof(plainTextBuffer); i++) {
       plainTextBuffer[i] = (unsigned char)bytestopadd;
-      
     }
   }
 
@@ -189,7 +188,7 @@ int Step2ResponseProcessing(String &ReceivedPackage, JsonDocument &JsonPackageRe
       UpdateTimeinfo();
       OP_TIME_Handler(PackageBuffer);
       break;
-    case OP_STATI-ONS_STATE:
+    case OP_STATIONS_STATE:
       OP_STATIONS_STATE_Handler(PackageBuffer);
       break;
     case OP_WEATHER:

@@ -26,7 +26,7 @@ void setup() {
   vTaskDelay(1000 / portTICK_PERIOD_MS);
   OP_TIME_Wrapper();
   Home_ScreenUpdate();
-
+  
   timer = timerBegin(timer_id, prescaler, true);
   timerAttachInterrupt(timer, &timer_isr, true);
   timerAlarmWrite(timer, threshold, true);
