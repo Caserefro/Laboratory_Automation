@@ -11,7 +11,6 @@
 String serverNameS1 = "http://192.168.100.184/S1";
 String serverNameS2 = "http://192.168.100.184/S2";
 
-
 #define OP_SERVER_PING 10
 #define OP_ADMIN_INFO 40
 #define OP_ADMIN_SETTIME 41

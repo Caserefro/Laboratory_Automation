@@ -189,7 +189,7 @@ int Step2ResponseProcessing(String &ReceivedPackage, JsonDocument &JsonPackageRe
       UpdateTimeinfo();
       OP_TIME_Handler(PackageBuffer);
       break;
-    case OP_STATI-ONS_STATE:
+    case OP_STATIONS_STATE: 
       OP_STATIONS_STATE_Handler(PackageBuffer);
       break;
     case OP_WEATHER:
@@ -277,10 +277,8 @@ void Step2Handle() {
       server.send(200, "plain", Package);
       if (operation == OP_AC) {
         Serial.println(AC_command);
-        //function that send message trough BLE.
       }
       if (operation == OP_OPEN_CLOSE) {
-        //OPEN da goddammed door.
       }
     }
   } else {

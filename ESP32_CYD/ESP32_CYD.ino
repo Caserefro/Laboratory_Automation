@@ -25,6 +25,8 @@ void setup() {
   Serial.println("Connected to WiFi");
   vTaskDelay(1000 / portTICK_PERIOD_MS);
   OP_TIME_Wrapper();
+  OP_E_DEVICE_SYNC_Wrapper(ID_DEVICE1, DEVICE_TYPE1);
+  OP_E_DEVICE_SYNC_Wrapper(ID_DEVICE2, DEVICE_TYPE2);
   Home_ScreenUpdate();
   
   timer = timerBegin(timer_id, prescaler, true);
@@ -61,16 +63,27 @@ void setup() {
               NULL,
               1,
               &Timer_Task);
+  /*
+  xTaskCreate(SyncingTask,
+              "Port",
+              4096,
+              NULL,
+              1,
+              &Syncing_Task);
+*/
   // Delete "setup and loop" task
   Serial.println("end of setup succesfull --------------------------");
   xTouchScrSyncSemaphore = xSemaphoreCreateBinary();
   xScrWriteSemaphore = xSemaphoreCreateBinary();
   xSemaphoreGive(xTouchScrSyncSemaphore);  // Initially available
   xSemaphoreGive(xScrWriteSemaphore);      // Initially available
-  vTaskDelete(NULL);
+                                           // vTaskDelete(NULL);
+  server.on("/S1", HTTP_POST, Step1Handle);
+  server.on("/S2", HTTP_POST, Step2Handle);
+  server.begin();
 }
 void loop() {
-  //this will get deleted
+  server.handleClient();
 }
 
 void printFreeStackSpace(const char *taskName) {
@@ -220,9 +233,9 @@ void TimerTask(void *parameters) {
       xTaskNotify(GraphicManager_Task, 0, eIncrement);  // Notify Task C to start
     } else {
       if (ScreenState == HomeScreenID) {  //check for homepage
-        Write_HomeScr_time();             //update time in Scr
+        Home_ScreenUpdate();              //update time in Scr
         if (DayFlag) {                    //update date
-          Write_HomeScr_date();
+          Home_ScreenUpdate();
           DayFlag = false;
         }
       }

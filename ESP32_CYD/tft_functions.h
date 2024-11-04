@@ -230,10 +230,7 @@ void Home_ScreenUpdate() {
   tft.fillRect(130, 5, 230, 25, TFT_WHITE);
   Write_HomeScr_time();
   Write_HomeScr_date();
-  tft.pushImage(40, 1, 24, 28, SDState ? SD_ok : No_SD);
   tft.pushImage(77, 1, 35, 29, WiFiState ? WIFi_ok : No_WiFi);
-  tft.pushImage(373, 1, 30, 30, Station1State ? Signal_ok_Station : No_Signal_Station);
-  tft.pushImage(411, 1, 30, 30, Station2State ? Signal_ok_Station : No_Signal_Station);
   ScreenState = HomeScreenID;
   AnimationState = 0;  //Disables all current animations.
 }
@@ -291,13 +288,13 @@ void Weather_Screen() {  // values come from global
   LoadingPopup();
   OP_WEATHER_Wrapper();
   tft.pushImage(0, 0, 480, 320, Weather_Ui);
-  String WindSpd = String((int)WeatherData.WindSpd) + " km/h";
-  String Temp = String((int)WeatherData.Temp) + " C";
-  String RainGauge = String((int)WeatherData.RainG) + " mm";
-  String Hum = String((int)WeatherData.RelHum) + "%";
+  String WindSpd = String((int)ActiveWeatherData.WindSpd) + " km/h";
+  String Temp = String((int)ActiveWeatherData.Temp) + " C";
+  String RainGauge = String((int)ActiveWeatherData.RainG) + " mm";
+  String Hum = String((int)ActiveWeatherData.RelHum) + "%";
   WriteText_tft(WindSpd, 115, 62);
-  WriteText_tft(WeatherData.WindDir, 302, 62);
-  WriteText_tft(String((int)WeatherData.UVidx), 115, 156);
+  WriteText_tft(ActiveWeatherData.WindDir, 302, 62);
+  WriteText_tft(String((int)ActiveWeatherData.UVidx), 115, 156);
   WriteText_tft(Temp, 299, 156);
   WriteText_tft(RainGauge, 115, 255);
   WriteText_tft(Hum, 299, 255);
@@ -321,7 +318,7 @@ bool isTouchWithinButton(int x, int y, int size, Button button) {
 void LockUnlock_btn() {
   //Send Command to master, so he sends it to espLock
   LoadingPopup();
-  OP_OPEN_CLOSE_Wrapper();
+  OP_OPEN_CLOSE_Wrapper(true);
   RecoverScreenState();
 }
 
@@ -369,25 +366,25 @@ void Save_btn() {  //Pending. Will dump all borrowed data into the sd card.
 
 void OnOff_btn() {
   LoadingPopup();
-  OP_AC_Wrapper(OP_ACONOFF);
+  OP_AC_Wrapper(OP_AC_ONOFF);
   Ac_ScreenUpdate();
 }
 
 void SwingFan_btn() {
   LoadingPopup();
-  OP_AC_Wrapper(OP_ACSWINGFAN);
+  OP_AC_Wrapper(OP_AC_SWINGFAN);
   Ac_ScreenUpdate();
 }
 
 void UpTemp_btn() {
   LoadingPopup();
-  OP_AC_Wrapper(OP_ACUPTEMP);
+  OP_AC_Wrapper(OP_AC_UPTEMP);
   Ac_ScreenUpdate();
 }
 
 void DownTemp_btn() {
   LoadingPopup();
-  OP_AC_Wrapper(OP_ACDOWNTEMP);
+  OP_AC_Wrapper(OP_AC_DOWNTEMP);
   Ac_ScreenUpdate();
 }
 

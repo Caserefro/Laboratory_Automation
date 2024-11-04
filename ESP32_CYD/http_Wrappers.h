@@ -17,10 +17,10 @@ void OP_SERVER_PING_Wrapper() {
   String OldNonce = "";
   JsonDocument doc;
   Step1Package(Package, OldNonce);
-  if (postData(serverNameS1, Package, response)) {
+  if (postData(Step1Adr, Package, response)) {
     Step2PackageCore(response, doc, OldNonce);
     Step2Package_OP_GENERAL_USE(doc, Package, OP_SERVER_PING);
-    if (postData(serverNameS2, Package, responsebuffer)) {
+    if (postData(Step2Adr, Package, responsebuffer)) {
       decryptStringCBC(responsebuffer, key, response);
     } else {
       response = "error posting data";
@@ -33,17 +33,17 @@ void OP_SERVER_PING_Wrapper() {
   return;
 }
 
-void OP_OPEN_CLOSE_Wrapper() {
+void OP_E_DEVICE_SYNC_Wrapper(int ID_DEVICE, String &DEVICE_TYPE) {
   String response = "";
   String responsebuffer = "";
   String Package = "";
   String OldNonce = "";
   JsonDocument doc;
   Step1Package(Package, OldNonce);
-  if (postData(serverNameS1, Package, response)) {
+  if (postData(Step1Adr, Package, response)) {
     Step2PackageCore(response, doc, OldNonce);
-    Step2Package_OP_GENERAL_USE(doc, Package, OP_OPEN_CLOSE);
-    if (postData(serverNameS2, Package, responsebuffer)) {
+    Step2Package_OP_E_DEVICE_SYNC(doc, Package, OP_E_DEVICE_SYNC, ID_DEVICE, DEVICE_TYPE);
+    if (postData(Step2Adr, Package, responsebuffer)) {
       decryptStringCBC(responsebuffer, key, response);
     } else {
       response = "error posting data";
@@ -56,14 +56,12 @@ void OP_OPEN_CLOSE_Wrapper() {
   return;
 }
 
+
 void OP_TIME_Wrapper() {
   String response = "";
-  String responsebuffer = "";
-  String Package = "";
-  String OldNonce = "";
   JsonDocument doc;
-  httpGETRequest();
-
+  httpGETRequest(TimeAdr, response);
+  deserializeJson(doc, response);
   timeinfo.tm_sec = doc["tm_sec"];
   timeinfo.tm_min = doc["tm_min"];
   timeinfo.tm_hour = doc["tm_hour"];
@@ -76,74 +74,58 @@ void OP_TIME_Wrapper() {
   return;
 }
 
+void OP_OPEN_CLOSE_Wrapper(bool Open) {
+  String response = "";
+  String responsebuffer = "";
+  String Package = "";
+  String OldNonce = "";
+  JsonDocument doc;
+  Step1Package(Package, OldNonce);
+  if (postData(Step1Adr, Package, response)) {
+    Step2PackageCore(response, doc, OldNonce);
+    Step2Package_OP_OPEN_CLOSE(doc, Package, OP_OPEN_CLOSE, Open);
+    if (postData(Step2Adr, Package, responsebuffer)) {
+      decryptStringCBC(responsebuffer, key, response);
+    } else {
+      response = "error posting data";
+      return;
+    }
+  } else {
+    response = "error posting data";
+  }
+  Serial.println(response);
+  return;
+}
+
 void OP_WEATHER_Wrapper() {
   String response = "";
   String responsebuffer = "";
   String Package = "";
   String OldNonce = "";
   JsonDocument doc;
-  Step1Package(Package, OldNonce);
-  if (postData(serverNameS1, Package, response)) {
-    Step2PackageCore(response, doc, OldNonce);
-    Step2Package_OP_GENERAL_USE(doc, Package, OP_WEATHER);
-    if (postData(serverNameS2, Package, responsebuffer)) {
-      decryptStringCBC(responsebuffer, key, response);
-      Serial.println(response);
-      deserializeJson(doc, response);
-    } else {
-      response = "error posting data";
-      return;
-    }
-  } else {
-    response = "error posting data";
-  }
-  WeatherData.WindSpd = doc["WindSpd"];
+  httpGETRequest(WeatherAdr, response);
+  deserializeJson(doc, response);
+  ActiveWeatherData.WindSpd = doc["WindSpd"];
   String WindDirBuffer = doc["WindDir"].as<String>();
-  WeatherData.WindDir = WindDirBuffer;
-  WeatherData.UVidx = doc["UVidx"];
-  WeatherData.Temp = doc["Temp"];
-  WeatherData.RainG = doc["RainG"];
-  WeatherData.RelHum = doc["RelHum"];
+  ActiveWeatherData.WindDir = WindDirBuffer;
+  ActiveWeatherData.UVidx = doc["UVidx"];
+  ActiveWeatherData.Temp = doc["Temp"];
+  ActiveWeatherData.RainG = doc["RainG"];
+  ActiveWeatherData.RelHum = doc["RelHum"];
   return;
 }
 
-void OP_STATIONS_STATE_Wrapper() {
+void OP_BORROWEDITEMS_INFO_Wrapper(int *LackingIDs) {
   String response = "";
   String responsebuffer = "";
   String Package = "";
   String OldNonce = "";
   JsonDocument doc;
   Step1Package(Package, OldNonce);
-  if (postData(serverNameS1, Package, response)) {
+  if (postData(Step1Adr, Package, response)) {
     Step2PackageCore(response, doc, OldNonce);
-    Step2Package_OP_GENERAL_USE(doc, Package, OP_STATIONS_STATE);
-    if (postData(serverNameS2, Package, responsebuffer)) {
-      decryptStringCBC(responsebuffer, key, response);
-      Serial.println(response);
-      deserializeJson(doc, response);
-    } else {
-      response = "error posting data";
-      return;
-    }
-  } else {
-    response = "error posting data";
-  }
-  StationsState.Station1 = doc["Station1"];
-  StationsState.Station2 = doc["Station2"];
-  return;
-}
-
-void OP_INFOITEMS_Wrapper(int *LackingIDs) {
-  String response = "";
-  String responsebuffer = "";
-  String Package = "";
-  String OldNonce = "";
-  JsonDocument doc;
-  Step1Package(Package, OldNonce);
-  if (postData(serverNameS1, Package, response)) {
-    Step2PackageCore(response, doc, OldNonce);
-    Step2Package_OP_GENERAL_USE(doc, Package, OP_INFOITEMS);
-    if (postData(serverNameS2, Package, responsebuffer)) {
+    Step2Package_OP_GENERAL_USE(doc, Package, OP_BORROWEDITEMS_INFO);
+    if (postData(Step2Adr, Package, responsebuffer)) {
       decryptStringCBC(responsebuffer, key, response);
       Serial.println(response);
       deserializeJson(doc, response);
@@ -171,55 +153,70 @@ void OP_INFOITEMS_Wrapper(int *LackingIDs) {
   }
 }
 
-
-void OP_ITEM_REQUEST_Wrapper(int *LackingIDs) {
+void OP_BORROWEDITEMS_REQUEST_Wrapper(int *LackingIDs) {  // Modified and cleaner version
   String response = "";
   String responsebuffer = "";
   String Package = "";
   String OldNonce = "";
-  JsonDocument doc;
+  DynamicJsonDocument doc(4096);  // Assuming response isn't too large; increase if needed
+
+  // Step 1: Create and send the first package
   Step1Package(Package, OldNonce);
-  if (postData(serverNameS1, Package, response)) {
-    JsonDocument newdoc;
+  if (postData(Step1Adr, Package, response)) {
+    DynamicJsonDocument newdoc(4096);
     String newPackage = "";
+
+    // Step 2: Handle response and prepare for step 2
     Step2PackageCore(response, newdoc, OldNonce);
-    Step2Package_OP_ITEM_REQUEST(newdoc, newPackage, OP_ITEM_REQUEST, LackingIDs);
+    Step2Package_OP_BORROWEDITEMS_REQUEST(newdoc, newPackage, OP_BORROWEDITEMS_REQUEST, LackingIDs);
     Serial.println(newPackage);
-    if (postData(serverNameS2, newPackage, responsebuffer)) {
+
+    // Step 3: Post data and decrypt response
+    if (postData(Step2Adr, newPackage, responsebuffer)) {
       decryptStringCBC(responsebuffer, key, response);
+      Serial.println(response);
+
+      // Deserialize the entire JSON response
+      DeserializationError error = deserializeJson(doc, response);
+      if (error) {
+        Serial.print("JSON Deserialization failed: ");
+        Serial.println(error.c_str());
+        return;
+      }
     } else {
-      response = "error posting data";
+      Serial.println("Error posting data for step 2");
       return;
     }
   } else {
-    response = "error posting data";
+    Serial.println("Error posting data for step 1");
+    return;
   }
-  Serial.println("response OP_ITEM_REQUEST_Wrapper ");
-  Serial.println(response);
-  JsonDocument ResponseBuffer;
-  String SingleStructBuffer = "";
-  int startIndex = 0;
-  int endIndex = response.indexOf('}');
-  while (endIndex != -1) {
-    String SingleStructBuffer = response.substring(startIndex, endIndex + 1);  // Adjusted to include the closing brace
-    Serial.println(SingleStructBuffer);
-    startIndex = endIndex + 1;
-    endIndex = response.indexOf('}', startIndex);
-    deserializeJson(ResponseBuffer, SingleStructBuffer);
+
+  // Step 4: Extract the "Items" array from the JSON response
+  JsonArray itemsArray = doc["Items"].as<JsonArray>();
+  if (itemsArray.isNull()) {
+    Serial.println("No 'Items' array found in the response");
+    return;
+  }
+
+  // Step 5: Iterate through the "Items" array and process each object
+  for (JsonObject itemObj : itemsArray) {
     BorrowedItem buffer;
-    buffer.ItemID = ResponseBuffer["ItemID"];
-    buffer.Item = ResponseBuffer["Item"].as<String>();
-    buffer.Name = ResponseBuffer["Name"].as<String>();
-    buffer.NCID = ResponseBuffer["NCID"];
-    buffer.Time = ResponseBuffer["Time"].as<String>();
-    buffer.Date = ResponseBuffer["Date"].as<String>();
-    buffer.Returned = ResponseBuffer["Returned"];
-    buffer.TimeReturned = ResponseBuffer["TimeReturned"].as<String>();
-    buffer.DateReturned = ResponseBuffer["DateReturned"].as<String>();
+    buffer.ItemID = itemObj["ItemID"];
+    buffer.Item = itemObj["Item"].as<String>();
+    buffer.Name = itemObj["Name"].as<String>();
+    buffer.NCID = itemObj["NCID"];
+    buffer.Time = itemObj["Time"].as<String>();
+    buffer.Date = itemObj["Date"].as<String>();
+    buffer.Returned = itemObj["Returned"];
+    buffer.TimeReturned = itemObj["TimeReturned"].as<String>();
+    buffer.DateReturned = itemObj["DateReturned"].as<String>();
+
+    // Add the item to your system (replace addItem with your actual function)
     addItem(buffer);
   }
-  return;
 }
+
 
 void addItem(const BorrowedItem &item) {
   // Shift items up
@@ -252,17 +249,17 @@ BorrowedItem *findItem(int itemID) {
   return nullptr;
 }
 
-void OP_RETURNED_Wrapper(int ItemID, int State) {
+void OP_BORROWED_ITEM_CHANGE_Wrapper(int ItemID, int State) {
   String response = "";
   String responsebuffer = "";
   String Package = "";
   String OldNonce = "";
   JsonDocument doc;
   Step1Package(Package, OldNonce);
-  if (postData(serverNameS1, Package, response)) {
+  if (postData(Step1Adr, Package, response)) {
     Step2PackageCore(response, doc, OldNonce);
-    Step2Package_OP_RETURNED(doc, Package, ItemID, State);
-    if (postData(serverNameS2, Package, responsebuffer)) {
+    Step2Package_OP_BORROWED_ITEM_CHANGE(doc, Package, ItemID, State);
+    if (postData(Step2Adr, Package, responsebuffer)) {
       decryptStringCBC(responsebuffer, key, response);
       JsonDocument ReceivedJson;
       deserializeJson(ReceivedJson, response);
@@ -291,10 +288,10 @@ void OP_AC_Wrapper(int Command) {
   String OldNonce = "";
   JsonDocument doc;
   Step1Package(Package, OldNonce);
-  if (postData(serverNameS1, Package, response)) {
+  if (postData(Step1Adr, Package, response)) {
     Step2PackageCore(response, doc, OldNonce);
     Step2Package_OP_AC(doc, Package, OP_AC, Command);
-    if (postData(serverNameS2, Package, responsebuffer)) {
+    if (postData(Step2Adr, Package, responsebuffer)) {
       decryptStringCBC(responsebuffer, key, response);
     } else {
       response = "error posting data";

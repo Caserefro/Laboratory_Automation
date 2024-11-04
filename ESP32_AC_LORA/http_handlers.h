@@ -107,7 +107,6 @@ bool decryptStringCBC(const String &cipherText, const char *key, String &OutputS
   return 1;
 }
 
-
 //SERVER FUNCTIONS ---------------------------------------------------------------------------------------------------------------------
 void Step1Response(String &ReceivedPackage, String &PackagetoSend, String &SecondNonce) {  //Server
                                                                                            /* Receives Step 1 Package, Decrypyts, Separates the json, saves ID of sender, and Creates Response package (String). 
@@ -172,74 +171,18 @@ int Step2ResponseProcessing(String &ReceivedPackage, JsonDocument &JsonPackageRe
 }
 
 
-  void Step2ResponsePackage(String &Package, JsonDocument &JsonPackageReceived, int operation, int &AC_command) {
+void Step2ResponsePackage(String &Package, JsonDocument &JsonPackageReceived, int operation, int &AC_command) {
   JsonDocument JsonPackagetoSend;
   String PackageBuffer = "";
   switch (operation) {
     case OP_SERVER_PING:
       PackageBuffer = "PING";
       break;
-    case OP_OPEN_CLOSE:
-      PackageBuffer = "ACK";
-      CreateRecord();
-      //write record here, and communicate with door.  //pending.
-      break;
-    case OP_TIME:
-      UpdateTimeinfo();
-      OP_TIME_Handler(PackageBuffer);
-      break;
-    case OP_STATIONS_STATE:
-      OP_STATIONS_STATE_Handler(PackageBuffer);
-      break;
-    case OP_WEATHER:
+    case OP_WEATHER_UPDATE:
       OP_WEATHER_Handler(PackageBuffer);
       break;
-
-    case OP_INFOITEMS:
-      OP_INFOITEMS_Handler(PackageBuffer);
-      break;
-    case OP_ITEM_REQUEST:
-      OP_ITEM_REQUEST_Handler(JsonPackageReceived, PackageBuffer);  //pending
-      break;
-    case OP_RETURNED:
-      OP_RETURNED_Handler(JsonPackageReceived, PackageBuffer);
-      break;
-    case OP_ADDITEM:
-      //pending, this one will only interact with android, so idk yet bout it.
-      OP_ADDITEM_Handler(JsonPackageReceived, PackageBuffer);
-      break;
-
     case OP_AC:
       OP_AC_Handler(JsonPackageReceived, PackageBuffer, AC_command);
-      break;
-
-    case OP_ADMIN_INFO:
-      OP_ADMIN_INFO_Handler(PackageBuffer);
-      break;
-    case OP_ADMIN_SETTIME:
-      OP_ADMIN_SETTIME_Handler(JsonPackageReceived, PackageBuffer);
-      break;
-    case OP_ADMIN_ALLSTUDENTS:
-      OP_ADMIN_ALLSTUDENTS_Handler(PackageBuffer);
-      break;
-    case OP_ADMIN_ADDSTUDENT:
-      OP_ADMIN_ADDSTUDENT_Handler(JsonPackageReceived, PackageBuffer);
-      break;
-    case OP_ADMIN_DELSTUDENT:
-      OP_ADMIN_DELSTUDENT_Handler(JsonPackageReceived, PackageBuffer);
-      break;
-    case OP_ADMIN_RECORD_DUMP:
-      OP_ADMIN_RECORD_DUMP_Handler(PackageBuffer);
-      break;
-
-    case OP_ANDROID_AUTH:
-      OP_ANDROID_AUTH_Handler(JsonPackageReceived, PackageBuffer);
-      break;
-    case OP_ANDROID_LAYOUT_INFO:
-      OP_ANDROID_LAYOUT_INFO_Handler(PackageBuffer);
-      break;
-    case OP_ANDROID_LAYOUT:
-      OP_ANDROID_LAYOUT_Handler(PackageBuffer);
       break;
   }
   encryptStringCBC(PackageBuffer, key, Package);
@@ -274,17 +217,23 @@ void Step2Handle() {
     } else {
       Step2ResponsePackage(Package, JsonPackageReceived, operation, AC_command);
       server.send(200, "plain", Package);
-      if (operation == OP_AC) {
-        Serial.println(AC_command);
-        //function that send message trough BLE.
-      }
-      if (operation == OP_OPEN_CLOSE) {
-        //OPEN da goddammed door.
-      }
     }
   } else {
     server.send(400, "plain", "No body received");
   }
+}
+
+void Step2Package_OP_E_DEVICE_SYNC(JsonDocument &JsonPackagetoSend, String &PackagetoSend, int Operation, int ID_DEVICE, String& DEVICE_TYPE) {  //Client used for request that dont add any special parameters.
+  JsonPackagetoSend["Operation"] = Operation;
+  JsonPackagetoSend["ID"] = ID_DEVICE;
+  JsonPackagetoSend["IP"] = WiFi.localIP();
+  JsonPackagetoSend["TYPE"] = DEVICE_TYPE;
+  JsonPackagetoSend["PLACE"] = PLACE;
+  String PackageBuffer = "";
+  serializeJson(JsonPackagetoSend, PackageBuffer);
+  Serial.println("PackageBuffer");
+  Serial.println(PackageBuffer);
+  encryptStringCBC(PackageBuffer, key, PackagetoSend);  // Encrypts Package for sending.
 }
 
 #endif

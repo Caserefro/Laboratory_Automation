@@ -68,6 +68,7 @@ ScrollingTextSprite ItemBottom;
 ScrollingTextSprite NameandNCBottom;
 ScrollingTextSprite DatesBottom;
 
+
 #define TURNOFFSCREENPIN 27
 #define SLEEPTIMER 2
 int ScreenSaverX = 0;
@@ -152,4 +153,5 @@ void RecoverScreenState();
 #include "http_functions.h"
 #include "http_Wrappers.h"
 #include "Step2Packages.h"
+#include "server_handlers.h"
 #endif

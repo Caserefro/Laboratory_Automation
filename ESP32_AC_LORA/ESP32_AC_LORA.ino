@@ -10,31 +10,11 @@ void setup() {
     delay(1000);
     Serial.println("Connecting to WiFi...");
   }
-  if (!WiFi.config(local_IP, gateway, subnet)) {
-    Serial.println("STA Failed to configure");
-  }
   Serial.println("Connected to WiFi");
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
-
-  if (!LittleFS.begin(FORMAT_LITTLEFS_IF_FAILED)) {
-    Serial.println("LittleFS Mount Failed");
-    return;
-  }
-  if (!preferences.begin("my-app", false)) {
-    Serial.println("Failed to initialize Preferences");
-    return;
-  }
-  deleteFile(LittleFS, BorrowedItemsFile);  //Testing
-  deleteFile(LittleFS, RecordFile);         //Testing
-  deleteFile(LittleFS, UsersFile);          //Testing
-  TestingSetup(LittleFS);                   //Testing
-
-  TotalJsoninFile(LittleFS, BorrowedItemsFile);
-  BiggestItemID(LittleFS, BorrowedItemsFile);
-
-  SettingupPreferences();
-
+  OP_E_DEVICE_SYNC_Wrapper(ID_DEVICE1, DEVICE_TYPE1);
+  OP_E_DEVICE_SYNC_Wrapper(ID_DEVICE2, DEVICE_TYPE2);
   server.on("/S1", HTTP_POST, Step1Handle);
   server.on("/S2", HTTP_POST, Step2Handle);
   server.begin();

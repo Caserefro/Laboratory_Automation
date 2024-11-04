@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="5a17639e-0e5c-4bdd-a599-e82070754d06" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../AdminClient/ADMINCLIENT.h" beforeDir="false" afterPath="$PROJECT_DIR$/../AdminClient/ADMINCLIENT.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ESP32_AC_LORA/Credentials.h" beforeDir="false" afterPath="$PROJECT_DIR$/../ESP32_AC_LORA/Credentials.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ESP32_AC_LORA/ESP32_AC_LORA.h" beforeDir="false" afterPath="$PROJECT_DIR$/../ESP32_AC_LORA/ESP32_AC_LORA.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ESP32_AC_LORA/ESP32_AC_LORA.ino" beforeDir="false" afterPath="$PROJECT_DIR$/../ESP32_AC_LORA/ESP32_AC_LORA.ino" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ESP32_AC_LORA/LittleFsFunctions.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ESP32_AC_LORA/Wrappers.h" beforeDir="false" afterPath="$PROJECT_DIR$/../ESP32_AC_LORA/Wrappers.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ESP32_AC_LORA/http_handlers.h" beforeDir="false" afterPath="$PROJECT_DIR$/../ESP32_AC_LORA/http_handlers.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ESP32_CYD/Client_Definitions.h" beforeDir="false" afterPath="$PROJECT_DIR$/../ESP32_CYD/Client_Definitions.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ESP32_CYD/ESP32_CYD.h" beforeDir="false" afterPath="$PROJECT_DIR$/../ESP32_CYD/ESP32_CYD.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ESP32_CYD/ESP32_CYD.ino" beforeDir="false" afterPath="$PROJECT_DIR$/../ESP32_CYD/ESP32_CYD.ino" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ESP32_CYD/Step2Packages.h" beforeDir="false" afterPath="$PROJECT_DIR$/../ESP32_CYD/Step2Packages.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ESP32_CYD/http_Wrappers.h" beforeDir="false" afterPath="$PROJECT_DIR$/../ESP32_CYD/http_Wrappers.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ESP32_CYD/tft_functions.h" beforeDir="false" afterPath="$PROJECT_DIR$/../ESP32_CYD/tft_functions.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ESP32_Master/http_handlers.h" beforeDir="false" afterPath="$PROJECT_DIR$/../ESP32_Master/http_handlers.h" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/.venv/CLI.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/.venv/Classes.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/.venv/Credentials.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/.venv/Encryption.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/.venv/Handlers.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/.venv/Test queries.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/.venv/create_tables.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/.venv/database tests.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/.venv/httpEncrypted.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/.venv/main.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/.venv/testCLI.py" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 2
+}</component>
+  <component name="ProjectId" id="2lJqfqnH1maKooFO69faGgyw0k6" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Notification.DisplayName-DoNotAsk-Material Theme Notifications": "Material theme UI notifications",
+    "Notification.DoNotAsk-Material Theme Notifications": "true",
+    "Python.CLI.executor": "Run",
+    "Python.Credentials.executor": "Run",
+    "Python.Handlers.executor": "Run",
+    "Python.SQL classes.executor": "Run",
+    "Python.Test queries.executor": "Run",
+    "Python.create_tables.executor": "Run",
+    "Python.encryption.executor": "Run",
+    "Python.main.executor": "Run",
+    "Python.test CLI.executor": "Run",
+    "Python.testCLI.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "Testing",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "C:/Users/caser/Documents/GitHub/Laboratory_Automation/pythonProject",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\caser\Documents\GitHub\Laboratory_Automation" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="Test queries" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="ClubDeRoboticaAppWebServer" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/.venv" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/.venv/Test queries.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.Test queries" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-50da183f06c8-d3b881c8e49f-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-233.13135.95" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="5a17639e-0e5c-4bdd-a599-e82070754d06" name="Changes" comment="" />
+      <created>1724908633056</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1724908633056</updated>
+    </task>
+    <servers />
+  </component>
+</project>
