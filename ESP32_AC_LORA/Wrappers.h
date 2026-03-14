@@ -1,7 +1,7 @@
 #ifndef WRAPPERS_H
 #define WRAPPERS_H
 
-void OP_TIME_Handler(String& Package) {
+void OP_TIME_Handler(String &Package) {
   JsonDocument JsonPackagetoSend;
   JsonPackagetoSend["tm_sec"] = timeinfo.tm_sec;
   JsonPackagetoSend["tm_min"] = timeinfo.tm_min;
@@ -15,7 +15,7 @@ void OP_TIME_Handler(String& Package) {
   serializeJson(JsonPackagetoSend, Package);
 }
 
-void OP_WEATHER_Handler(String& Package) {
+void OP_WEATHER_Handler(String &Package) {
   JsonDocument JsonPackagetoSend;
   JsonPackagetoSend["WindSpd"] = WeatherData.WindSpd;
   JsonPackagetoSend["WindDir"] = WeatherData.WindDir;
@@ -26,14 +26,14 @@ void OP_WEATHER_Handler(String& Package) {
   serializeJson(JsonPackagetoSend, Package);
 }
 
-void OP_STATIONS_STATE_Handler(String& Package) {
+void OP_STATIONS_STATE_Handler(String &Package) {
   JsonDocument JsonPackagetoSend;
   JsonPackagetoSend["Station1"] = StationsState.Station1;
   JsonPackagetoSend["Station2"] = StationsState.Station2;
   serializeJson(JsonPackagetoSend, Package);
 }
 
-void OP_AC_Handler(JsonDocument& JsonPackageReceived, String& Package, int& Command) {
+void OP_AC_Handler(JsonDocument &JsonPackageReceived, String &Package, int &Command) {
   static int currenttemp = 5;
   static bool OnorOff = 0;
   Command = JsonPackageReceived["Command"];
@@ -92,32 +92,30 @@ void httpGETRequest(String &serverName, String &payload) {  //Not used.
 
 bool postData(String &serverName, String &payload, String &response) {
   if (WiFi.status() == WL_CONNECTED) {  // Check WiFi connection status
-    HTTPClient http;
-    http.begin(serverName);  // Specify the URL
-    http.addHeader("Content-Type", "text/plain");
-    // Send HTTP POST request
-    int httpResponseCode = http.POST(payload);
-    Serial.println(httpResponseCode);
-    // Check the returning code
-    if (httpResponseCode > 0) {
-      response = http.getString();  // Get the response to the request
-
-      Serial.println(response);  // Print request answer
-      http.end();                // Free resources
-      return 1;
-    } else {
-      Serial.print("Error on sending POST: ");
-      Serial.println(httpResponseCode);
-      http.end();  // Free resources
-      return 0;
-    }
-
-    http.end();  // Free resources
-  } else {
     Serial.println("Error in WiFi connection");
-
     return 0;
   }
+  HTTPClient http;
+  http.begin(serverName);  // Specify the URL
+  http.addHeader("Content-Type", "text/plain");
+  // Send HTTP POST request
+  int httpResponseCode = http.POST(payload);
+  Serial.println(httpResponseCode);
+  // Check the returning code
+  if (httpResponseCode > 0) {
+    response = http.getString();  // Get the response to the request
+
+    Serial.println(response);  // Print request answer
+    http.end();                // Free resources
+    return 1;
+  } else {
+    Serial.print("Error on sending POST: ");
+    Serial.println(httpResponseCode);
+    http.end();  // Free resources
+    return 0;
+  }
+
+  http.end();  // Free resources
   return 1;
 }
 
@@ -214,7 +212,7 @@ bool Step2PackageCore(String &ReceivedPackage, JsonDocument &JsonPackagetoSend, 
   }
 }
 
-void OP_E_DEVICE_SYNC_Wrapper(int ID_DEVICE, String& DEVICE_TYPE) {
+void OP_E_DEVICE_SYNC_Wrapper(int ID_DEVICE, String &DEVICE_TYPE) {
   String response = "";
   String responsebuffer = "";
   String Package = "";

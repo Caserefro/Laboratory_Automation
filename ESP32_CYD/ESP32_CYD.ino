@@ -1,7 +1,8 @@
-#include "C:\Users\caser\Documents\GitHub\Laboratory_Automation\ESP32_CYD\ESP32_CYD.h"
+#include "ESP32_CYD.h"
 
-
+extern int ScrollingTextDelay; 
 void setup() {
+  int num2;
   Serial.begin(115200);
   Serial.println("Start of program ---------------------------------------");
   vTaskDelay(100 / portTICK_PERIOD_MS);
@@ -24,7 +25,7 @@ void setup() {
   }
   Serial.println("Connected to WiFi");
   vTaskDelay(1000 / portTICK_PERIOD_MS);
-  OP_TIME_Wrapper();
+  OP_TIME_Wrapper(); 
   OP_E_DEVICE_SYNC_Wrapper(ID_DEVICE1, DEVICE_TYPE1);
   OP_E_DEVICE_SYNC_Wrapper(ID_DEVICE2, DEVICE_TYPE2);
   Home_ScreenUpdate();
@@ -43,6 +44,7 @@ void setup() {
               NULL,
               1,
               &TouchSensor_Task);
+              
   xTaskCreate(GraphicManagerTask,  //manager of all the screens Changes in
               "Graphic Manager Task",
               16384,
@@ -72,7 +74,7 @@ void setup() {
               &Syncing_Task);
 */
   // Delete "setup and loop" task
-  Serial.println("end of setup succesfull --------------------------");
+  Serial.println("end of");
   xTouchScrSyncSemaphore = xSemaphoreCreateBinary();
   xScrWriteSemaphore = xSemaphoreCreateBinary();
   xSemaphoreGive(xTouchScrSyncSemaphore);  // Initially available
@@ -188,7 +190,7 @@ void GraphicManagerTask(void *parameters) {
               for (int i = 0; i < Total_Layouts && !buttonPressed; i++) {
                 if (Button_Layout[i].ID == ScreenState) {
                   for (int j = 0; j < Button_Layout[i].numButtons; j++) {
-                    if (isTouchWithinButton(xTouchData.x, xTouchData.y, xTouchData.size, Button_Layout[i].button[j])) {
+                    if (isTouchWithinButton(xTouchData.x, xTouchData.y, xTouchData.size, Button_Layout.[i]button[j])) {
                       Button_Layout[i].button[j].handler();
                       buttonPressed = true;
                       xQueueReset(GT911_queue);
@@ -237,7 +239,7 @@ void TimerTask(void *parameters) {
         if (DayFlag) {                    //update date
           Home_ScreenUpdate();
           DayFlag = false;
-        }
+        } 
       }
     }
     vTaskSuspend(NULL);

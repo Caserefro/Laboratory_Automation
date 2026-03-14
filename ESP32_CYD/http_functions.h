@@ -165,7 +165,7 @@ void httpGETRequest(String &serverName, String &payload) {  //Not used.
 
 void Step1Package(String &PackagetoSend, String &FirstNonce) {  //Client
   // Modifies @PackagetoSend with json architechture, with a random nonce, + ID + Step.
-
+  
   JsonDocument JsonPackage;
   String PackageBuffer = "";
   String nonceStr = "";
